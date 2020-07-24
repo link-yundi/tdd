@@ -51,12 +51,12 @@ func TestSumAll(t *testing.T) {
 			want: []int{3, 9},
 		},
 		{
-			name: "[1]",
+			name: "[], [1, 2]",
 			input: [][]int{
-				[]int{1, 2},
 				[]int{},
+				[]int{1, 2},
 			},
-			want: []int{3, 0},
+			want: []int{0, 3},
 		},
 	}
 	for _, test := range tests {
