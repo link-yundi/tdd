@@ -1,0 +1,3 @@
+package ch05_struct_method_interface
+
+
