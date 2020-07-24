@@ -1,7 +1,5 @@
-module "github.com/link-yundi/tdd"
+module github.com/link-yundi/tdd
 
 go 1.14
 
-require (
-	github.com/stretchr/testify latest
-)
+require github.com/stretchr/testify v1.6.1
