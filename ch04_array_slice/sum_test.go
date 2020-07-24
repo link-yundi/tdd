@@ -33,3 +33,38 @@ func Test(t *testing.T) {
 	}
 }
 
+func TestSumAll(t *testing.T) {
+	//type intSlice []int
+	assert := assert.New(t)
+	tests := []struct {
+		name string
+		input [][]int
+		want []int
+	}{
+		// TODO: test cases
+		{
+			name: "[1, 2], [2, 3, 5]",
+			input: [][]int{
+				[]int{1, 2},
+				[]int{2, 3, 4},
+			},
+			want: []int{3, 9},
+		},
+		{
+			name: "[1]",
+			input: [][]int{
+				[]int{1, 2},
+				[]int{},
+			},
+			want: []int{3, 0},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := SumAll(test.input[0], test.input[1])
+			want := test.want
+			assert.Equal(want, got)
+		})
+	}
+}
+
