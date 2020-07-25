@@ -1,7 +1,6 @@
 package ch06_pointer_error
 
 import (
-	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -25,7 +24,7 @@ func (w *Wallet) Deposit(amount Bitcoin) {
 
 func (w *Wallet) Withdraw(amount Bitcoin) error {
 	if w.balance < amount {
-		return errors.New("余额不足")
+		return ErrInsufficientFunds
 	}
 	w.balance -= amount
 	return nil
@@ -44,8 +43,8 @@ func TestDepositWithdraw(t *testing.T) {
 		assert.Equal(Bitcoin(20), wallet.Balance())
 	})
 	t.Run("Withdraw", func(t *testing.T) {
-		if err := wallet.Withdraw(Bitcoin(10)); err != nil {
-			t.Error(err)
+		if err := wallet.Withdraw(Bitcoin(30)); err != nil {
+			t.Fatal(err)
 		} else {
 			assert.Equal(Bitcoin(10), wallet.Balance())
 		}
