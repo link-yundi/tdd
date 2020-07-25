@@ -43,10 +43,11 @@ func TestDepositWithdraw(t *testing.T) {
 		assert.Equal(Bitcoin(20), wallet.Balance())
 	})
 	t.Run("Withdraw", func(t *testing.T) {
-		if err := wallet.Withdraw(Bitcoin(30)); err != nil {
+		if err := wallet.Withdraw(Bitcoin(100)); err == nil {
 			t.Fatal(err)
 		} else {
 			assert.Equal(Bitcoin(10), wallet.Balance())
 		}
+		//_ = wallet.Withdraw(Bitcoin(100))
 	})
 }
