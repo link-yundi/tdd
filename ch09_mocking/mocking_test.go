@@ -1,31 +1,35 @@
 package ch09_mocking
 
-//小思考：mocking在这里是作为sleep 1s的模拟，通过计数的方式
-//这里的DI思想是剥离出sleep依赖，作为接口单独实现功能，该接口实现的方式是实现一个Sleep函数
-
 import (
 	"bytes"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"testing"
 )
 
+/*小思考：mocking在这里是作为sleep 1s的模拟，通过计数的方式
+这里的DI思想是剥离出sleep依赖，作为接口单独实现功能，该接口实现的方式是实现一个Sleep函数
+*/
+
 const (
-	finalWorld     = "Go!"
 	countdownStart = 3
+	finalWord      = "Go!"
+	write          = "write"
+	sleep          = "sleep"
 )
 
-type Sleeper interface {
-	Sleep()
+type CountdownOperationSpy struct {
+	Calls []string
 }
 
-type SpySleeper struct {
-	Calls int
+func (s *CountdownOperationSpy) Sleep() {
+	s.Calls = append(s.Calls, sleep)
 }
 
-// mock: 可以记录依赖关系是怎样被使用的，可以用来记录传入进来的参数 多少次。。。在这里记录了Sleep()被调用多少次
-func (s *SpySleeper) Sleep() {
-	s.Calls++
+func (s *CountdownOperationSpy) Write(p []byte) (n int, err error) {
+	s.Calls = append(s.Calls, write)
+	return
 }
 
 func Countdown(out io.Writer, sleeper Sleeper) {
@@ -34,22 +38,36 @@ func Countdown(out io.Writer, sleeper Sleeper) {
 		fmt.Fprintln(out, i)
 	}
 	sleeper.Sleep()
-	fmt.Fprint(out, finalWorld)
+	fmt.Fprint(out, finalWord)
 }
 
 func TestCountdown(t *testing.T) {
-	buffer := &bytes.Buffer{}
-	spySleeper := &SpySleeper{}
-	Countdown(buffer, spySleeper)
-	got := buffer.String()
-	want := `3
+	assert := assert.New(t)
+	subTest1 := "print 3 to Go!"
+	subTest2 := "sleep before every print"
+	t.Run(subTest1, func(t *testing.T) {
+		buffer := &bytes.Buffer{}
+		Countdown(buffer, &CountdownOperationSpy{})
+		got := buffer.String()
+		want := `3
 2
 1
 Go!`
-	if got != want {
-		t.Errorf("got %q want %q", got, want)
-	}
-	if spySleeper.Calls != 4 {
-		t.Errorf("not enough calls to sleeper, want 4 got %d", spySleeper.Calls)
-	}
+		assert.Equal(want, got)
+	})
+	t.Run(subTest2, func(t *testing.T) {
+		spySleepPrinter := &CountdownOperationSpy{}
+		Countdown(spySleepPrinter, spySleepPrinter)
+		want := []string{
+			sleep,
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+		}
+		assert.Equal(want, spySleepPrinter.Calls)
+	})
 }
