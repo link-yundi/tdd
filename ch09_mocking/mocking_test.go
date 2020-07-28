@@ -97,3 +97,13 @@ func TestConfigurableSleeper(t *testing.T) {
 func (c *ConfigurableSleeper) Sleep() {
 	c.sleep(c.duration)
 }
+
+/*
+mocking: 没有对代码中重要的区域进行mock将会导致难以测试。在这里的例子中，我们不能测试
+		代码在每个打印之间暂停，但是还有无数其他的例子。调用一个可能失败的服务？想要在
+		一个特定的状态测试系统？在不使用mocking的情况下测试这些场景是非常困难的。
+
+一旦开发人员学会了mocking，就很容易对系统的每一个方面进行过度测试，按照它工作的方式而不是
+它做了什么。始终要注意测试的价值，以及它们在将来的重构中会产生什么样的影响。
+
+*/
