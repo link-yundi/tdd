@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"testing"
+	"time"
 )
 
 /*小思考：mocking在这里是作为sleep 1s的模拟，通过计数的方式
@@ -70,4 +71,29 @@ Go!`
 		}
 		assert.Equal(want, spySleepPrinter.Calls)
 	})
+}
+
+type ConfigurableSleeper struct {
+	duration time.Duration
+	sleep    func(time.Duration)
+}
+
+type SpyTime struct {
+	durationSlept time.Duration
+}
+
+func (s *SpyTime) Sleep(duration time.Duration) {
+	s.durationSlept = duration
+}
+
+func TestConfigurableSleeper(t *testing.T) {
+	sleepTime := 5 * time.Second
+	spyTime := &SpyTime{}
+	sleeper := ConfigurableSleeper{sleepTime, spyTime.Sleep}
+	sleeper.Sleep()
+	assert.Equal(t, sleepTime, spyTime.durationSlept)
+}
+
+func (c *ConfigurableSleeper) Sleep() {
+	c.sleep(c.duration)
 }
